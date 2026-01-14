@@ -1,0 +1,152 @@
+﻿<Fluent:RibbonWindow x:Class="Ayalon.RemoteTaskManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent" 
+        xmlns:local="clr-namespace:Ayalon.RemoteTaskManager"
+        Title="Ayalon Remote Task Manager" Height="700" Width="1150">
+
+    <Fluent:RibbonWindow.Resources>
+        <Style TargetType="{x:Type Fluent:Backstage}">
+            <Style.Resources>
+                <Style TargetType="{x:Type Fluent:Button}">
+                    <Style.Triggers>
+                        <Trigger Property="Name" Value="PART_BackButton">
+                            <Setter Property="RenderTransformOrigin" Value="0.2,0.2"/>
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.4" ScaleY="0.4"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Margin" Value="10,10,0,0"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Fluent:RibbonWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Fluent:Ribbon Grid.Row="0">
+            <Fluent:Ribbon.Menu>
+                <Fluent:Backstage Header="File">
+                    <Fluent:BackstageTabControl>
+                        <Fluent:BackstageTabItem Header="Recent">
+                            <Grid Margin="20">
+                                <StackPanel>
+                                    <TextBlock Text="Recent Computers" FontSize="20" Margin="0,0,0,10" Foreground="#004578"/>
+                                    <ListBox x:Name="lstRecentComputers" BorderThickness="0" Background="Transparent">
+                                        <ListBoxItem Content="srv-dc-01.local" Cursor="Hand" Margin="0,5"/>
+                                        <ListBoxItem Content="workstation-hr-05" Cursor="Hand" Margin="0,5"/>
+                                    </ListBox>
+                                </StackPanel>
+                            </Grid>
+                        </Fluent:BackstageTabItem>
+                        <Fluent:Button Header="Exit" Click="Exit_Click" Icon="/Resources/exit.png"/>
+                    </Fluent:BackstageTabControl>
+                </Fluent:Backstage>
+            </Fluent:Ribbon.Menu>
+
+            <Fluent:RibbonTabItem Header="Home">
+                <Fluent:RibbonGroupBox Header="Connection">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Computer Name:" FontSize="10"/>
+                        <Fluent:TextBox x:Name="txtComputerName" Width="150" Text="localhost"/>
+                    </StackPanel>
+                    <Fluent:Button x:Name="btnConnect" Header="Connect" LargeIcon="/Resources/connect.png" Click="btnConnect_Click" />
+                </Fluent:RibbonGroupBox>
+
+                <Fluent:RibbonGroupBox Header="Processes">
+                    <Fluent:Button Header="Terminate" Click="btnTerminate_Click" />
+                    <Fluent:SeparatorTabItem />
+                    <StackPanel Margin="5">
+                        <TextBlock Text="Quick Filter:" FontSize="10"/>
+                        <Fluent:TextBox x:Name="txtFilter" Width="180" TextChanged="txtFilter_TextChanged"/>
+                    </StackPanel>
+                </Fluent:RibbonGroupBox>
+            </Fluent:RibbonTabItem>
+
+            <Fluent:RibbonTabItem Header="View">
+                <Fluent:RibbonGroupBox Header="Appearance">
+                    <Fluent:Button Header="Light Theme" Tag="Light" Click="ThemeChange_Click" />
+                    <Fluent:Button Header="Dark Theme" Tag="Dark" Click="ThemeChange_Click" />
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="Panels">
+                    <Fluent:CheckBox x:Name="chkShowDetails" Header="Details Panel" IsChecked="True" />
+                </Fluent:RibbonGroupBox>
+            </Fluent:RibbonTabItem>
+        </Fluent:Ribbon>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <!-- שינוי לרוחב דינמי מבוסס על ה-Checkbox -->
+                <ColumnDefinition Width="{Binding IsChecked, ElementName=chkShowDetails, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=140}" />
+            </Grid.ColumnDefinitions>
+
+            <DataGrid x:Name="dgProcesses" Grid.Column="0" Margin="10" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Process Name" Binding="{Binding Name}" Width="2*"/>
+                    <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="Auto"/>
+                    <DataGridTextColumn Header="Memory (MB)" Binding="{Binding MemoryUsageBytes, Converter={StaticResource MBConverter}}" Width="*"/>
+                    <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="1.5*"/>
+                </DataGrid.Columns>
+                <DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <Expander IsExpanded="True" Background="#F3F2F1" BorderBrush="#EDEBE9" BorderThickness="0, 0, 0, 1">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#004578" />
+                                                        <TextBlock Text="{Binding ItemCount, StringFormat=' ({0} instances)'}" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter/>
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+            </DataGrid>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Background="#F0F0F0"/>
+
+            <!-- הפאנל הימני המעודכן עם כל ה-IDs הדרושים -->
+            <Border Grid.Column="2" Background="#F9F9F9" BorderBrush="#EDEBE9" BorderThickness="1,0,0,0" 
+                    Visibility="{Binding IsChecked, ElementName=chkShowDetails, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Margin="8">
+                    <TextBlock Text="System Resources" FontWeight="Bold" FontSize="14" Foreground="#004578" Margin="0,0,0,10"/>
+
+                    <!-- השמות (x:Name) שפתרו את השגיאה שלך ב-C# -->
+                    <TextBlock x:Name="txtCpuUsage" Text="CPU Usage: N/A" Margin="0,0,0,8" FontSize="13"/>
+                    <TextBlock x:Name="txtFreeMemory" Text="Free RAM: N/A" FontSize="13" Margin="0,0,0,20"/>
+
+                    <Separator Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Process Details" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="txtSelectedProcessInfo" Text="Select a process..." TextWrapping="Wrap" Foreground="Gray"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Fluent:StatusBar Grid.Row="2" Background="#004578" Foreground="White">
+            <Fluent:StatusBarItem x:Name="txtStatus" Content="Ready" />
+            <Separator />
+            <Fluent:StatusBarItem x:Name="txtConnectionDetails" Content="Not Connected" />
+        </Fluent:StatusBar>
+
+    </Grid>
+</Fluent:RibbonWindow>
