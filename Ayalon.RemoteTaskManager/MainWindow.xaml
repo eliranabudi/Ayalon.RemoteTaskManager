@@ -42,16 +42,29 @@
                 <Fluent:Backstage Header="File">
                     <Fluent:BackstageTabControl>
                         <Fluent:BackstageTabItem Header="Recent">
-                            <Grid Margin="20">
-                                <StackPanel>
-                                    <TextBlock Text="Recent Computers" FontSize="20" Margin="0,0,0,10" Foreground="#004578"/>
-                                    <ListBox x:Name="lstRecentComputers" BorderThickness="0" Background="Transparent">
-                                        <ListBoxItem Content="srv-dc-01.local" Cursor="Hand" Margin="0,5"/>
-                                        <ListBoxItem Content="workstation-hr-05" Cursor="Hand" Margin="0,5"/>
-                                    </ListBox>
-                                </StackPanel>
-                            </Grid>
-                        </Fluent:BackstageTabItem>
+    <Grid Margin="30,20"> <StackPanel>
+            <TextBlock Text="Recent Connections" FontSize="24" FontWeight="Light" Foreground="#004578" Margin="0,0,0,20"/>
+            
+            <ListBox x:Name="lstRecentComputers" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border x:Name="ItemBorder" Padding="10" Margin="0,2" Background="#F3F2F1" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Resources/computer_icon.png" Width="16" Margin="0,0,10,0" Opacity="0.6"/>
+                                <TextBlock Text="{Binding}" FontSize="14" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#E1DFDD"/>
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </Grid>
+</Fluent:BackstageTabItem>
                         <Fluent:Button Header="Exit" Click="Exit_Click" Icon="/Resources/exit.png"/>
                     </Fluent:BackstageTabControl>
                 </Fluent:Backstage>
@@ -155,4 +168,5 @@
 
     </Grid>
 </Fluent:RibbonWindow>
+
 
