@@ -6,24 +6,29 @@
         Title="Ayalon Remote Task Manager" Height="700" Width="1150">
 
     <Fluent:RibbonWindow.Resources>
-        <Style TargetType="{x:Type Fluent:Backstage}">
-            <Style.Resources>
-                <Style TargetType="{x:Type Fluent:Button}">
-                    <Style.Triggers>
-                        <Trigger Property="Name" Value="PART_BackButton">
-                            <Setter Property="RenderTransformOrigin" Value="0.2,0.2"/>
-                            <Setter Property="RenderTransform">
-                                <Setter.Value>
-                                    <ScaleTransform ScaleX="0.4" ScaleY="0.4"/>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Margin" Value="10,10,0,0"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Style.Resources>
-        </Style>
-    </Fluent:RibbonWindow.Resources>
+    <SolidColorBrush x:Key="Fluent.Ribbon.Brushes.Backstage.Button.MouseOver.Background" Color="#E6E6E6"/>
+    <SolidColorBrush x:Key="Fluent.Ribbon.Brushes.Backstage.Button.MouseOver.Border" Color="#CCCCCC"/>
+
+    <Style TargetType="{x:Type Fluent:Backstage}">
+        <Style.Resources>
+            <Style TargetType="{x:Type Fluent:Button}">
+                <Style.Triggers>
+                    <Trigger Property="Name" Value="PART_BackButton">
+                        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                        <Setter Property="RenderTransform">
+                            <Setter.Value>
+                                <ScaleTransform ScaleX="0.75" ScaleY="0.75"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Margin" Value="8,10,0,0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
+    </Style>
+</Fluent:RibbonWindow.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -150,3 +155,4 @@
 
     </Grid>
 </Fluent:RibbonWindow>
+
