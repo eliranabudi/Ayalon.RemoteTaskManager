@@ -215,13 +215,23 @@ namespace Ayalon.RemoteTaskManager
         {
             string computerName = txtComputerName.Text;
          
-            /*if (string.IsNullOrEmpty(computerName) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(computerName))
             {
-                MessageBox.Show("Please enter computer name, username, and password.", "Missing Credentials", MessageBoxButton.OK, MessageBoxImage.Warning);            
+                MessageBox.Show("Please enter computer name!", "Missing Credentials", MessageBoxButton.OK, MessageBoxImage.Warning);            
                 return;
-            }*/
+            }
 
             RefreshData(computerName);
+            // הוסף בתוך btnConnect_Click אחרי שהחיבור הצליח:
+            var recentList = Properties.Settings.Default.RecentComputers ?? new System.Collections.Specialized.StringCollection();
+            if (!recentList.Contains(txtComputerName.Text)) 
+            {
+                recentList.Insert(0, txtComputerName.Text);
+                if (recentList.Count > 5) recentList.RemoveAt(5);
+                Properties.Settings.Default.RecentComputers = recentList;
+                Properties.Settings.Default.Save();
+                lstRecentComputers.ItemsSource = recentList.Cast<string>().ToList();
+            }
         }
 
         private void btnTerminate_Click(object sender, RoutedEventArgs e)
@@ -273,4 +283,5 @@ namespace Ayalon.RemoteTaskManager
             MessageBox.Show($"Theme changing to: {themeTag}");
         }
     }
+
 }
