@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -48,8 +49,32 @@ namespace Ayalon.RemoteTaskManager
             refreshTimer = new DispatcherTimer();
             refreshTimer.Interval = TimeSpan.FromSeconds(5);
             refreshTimer.Tick += RefreshTimer_Tick;
-        }
+            LoadRecentComputers();
 
+            lstRecentComputers.MouseDoubleClick += (s, e) => 
+            {
+                if (lstRecentComputers.SelectedItem != null)
+                {
+                    // עדכון תיבת הטקסט בשם המחשב שנבחר
+                    txtComputerName.Text = lstRecentComputers.SelectedItem.ToString();
+            
+                    // הפעלת פונקציית החיבור הקיימת שלך
+                    btnConnect_Click(null, null);
+                }
+            };
+        }
+        
+        private void LoadRecentComputers()
+        {
+            // בדיקה אם קיימת רשימה שמורה ב-Properties
+            if (Properties.Settings.Default.RecentComputers != null)
+            {
+                // המרה של ה-StringCollection לרשימה פשוטה והצגתה ב-UI
+                var list = Properties.Settings.Default.RecentComputers.Cast<string>().ToList();
+                lstRecentComputers.ItemsSource = list;
+            }
+        }
+        
         private void CheckIinitialAccess()
         {
             try
@@ -221,16 +246,15 @@ namespace Ayalon.RemoteTaskManager
                 return;
             }
 
-            RefreshData(computerName);
-            // הוסף בתוך btnConnect_Click אחרי שהחיבור הצליח:
-            var recentList = Properties.Settings.Default.RecentComputers ?? new System.Collections.Specialized.StringCollection();
-            if (!recentList.Contains(txtComputerName.Text)) 
+            try
             {
-                recentList.Insert(0, txtComputerName.Text);
-                if (recentList.Count > 5) recentList.RemoveAt(5);
-                Properties.Settings.Default.RecentComputers = recentList;
-                Properties.Settings.Default.Save();
-                lstRecentComputers.ItemsSource = recentList.Cast<string>().ToList();
+                RefreshData(computerName);                
+                UpdateRecentList(targetComputer);
+                txtStatus.Content = $"Connected to {targetComputer}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Connection failed: {ex.Message}");
             }
         }
 
@@ -282,6 +306,39 @@ namespace Ayalon.RemoteTaskManager
             string themeTag = button.Tag.ToString();
             MessageBox.Show($"Theme changing to: {themeTag}");
         }
+
+        private void UpdateRecentList(string computerName)
+{
+    // 1. טעינת הרשימה הקיימת (או יצירת חדשה אם זו הפעם הראשונה)
+    if (Properties.Settings.Default.RecentComputers == null)
+    {
+        Properties.Settings.Default.RecentComputers = new StringCollection();
+    }
+
+    var list = Properties.Settings.Default.RecentComputers;
+
+    // 2. בדיקה אם המחשב כבר קיים (כדי למנוע כפילויות)
+    if (list.Contains(computerName))
+    {
+        list.Remove(computerName);
+    }
+
+    // 3. הוספה לראש הרשימה (כדי שיופיע ראשון ב-Backstage)
+    list.Insert(0, computerName);
+
+    // 4. הגבלה ל-5 פריטים אחרונים בלבד
+    while (list.Count > 5)
+    {
+        list.RemoveAt(5);
+    }
+
+    // 5. שמירה פיזית על הדיסק
+    Properties.Settings.Default.Save();
+
+    // 6. עדכון ה-UI ב-Backstage
+    lstRecentComputers.ItemsSource = list.Cast<string>().ToList();
+}
     }
 
 }
+
